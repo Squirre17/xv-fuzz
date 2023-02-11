@@ -10,6 +10,14 @@
 #include <list>
 #include <vector>
 #include <exception>
+#include "str.h"
+#include <cstdio>
+#include <limits>
+#include <cstdint>
+#include <cinttypes>
+#include <filesystem>
+#include <cassert>
+#include <unistd.h>
 
 // TODO: make it only internal use
 struct Option {
@@ -36,8 +44,12 @@ namespace KW {
 
 class Args{
 public:
-    Args &parse_args(int argc, char *argv[]);
+    Args &parse_fuzzer_args(int argc, char *argv[]);
+    Args &parse_clang_args(int argc, char *argv[]);
     Args &process();
+    Args &show_params();
+    void exec();
+    std::vector<std::string> params;
 
 private:
     std::string fuzzee; /* fuzzee name */

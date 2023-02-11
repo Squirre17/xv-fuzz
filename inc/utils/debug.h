@@ -78,7 +78,7 @@
 /* wrap of printf */
 
 #define SAY(x...)     printf(x) 
-#define SAYL(x...)    printf(x "\n") // FIXME:
+#define SAYL(x...)    printf(x);printf("\n")
 
 /* Show a prefixed warning. */
 
@@ -107,7 +107,8 @@
     SAY(cPUR "[x] " cRST);                    \
     SAY("%s(), %s:%u : ",                     \
         __FUNCTION__, __FILE__, __LINE__ );   \
-    SAY(cRST x "\n");                         \
+    SAY(cRST);       \
+    SAYL(x);      \
   } while (0)
 
 /* Show a prefixed fatal error message . */

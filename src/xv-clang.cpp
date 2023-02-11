@@ -1,12 +1,12 @@
 #include "common.h"
 
 
-/* the clang fuzz main entry */
-void entry(Args &args) {
 
-}
-
-
-int main(int argc, char **argv) {
-    
+int main(int argc, char *argv[]) {
+    /* ./xv_fuzz program -i ./in -o ./out */
+    Args args;
+    args.parse_clang_args(argc, argv)
+        .process()
+        .show_params()
+        .exec();
 }

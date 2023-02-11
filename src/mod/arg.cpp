@@ -17,10 +17,9 @@ const std::vector<Option> KW::options_table(){
     return tab;
 }
 /*
-    @brief  : parse cmd line args 
+    @brief  : parse cmd line args for fuzzer
 */
-
-Args &Args::parse_args(int argc, char *argv[]) {
+Args &Args::parse_fuzzer_args(int argc, char *argv[]) {
 
     auto opt_table = KW::options_table();
 
@@ -60,8 +59,95 @@ Args &Args::parse_args(int argc, char *argv[]) {
     this->user_ops = user_ops;
     return *this;
 }
+namespace {
+    static const std::string CC     = "clang";
+    static const std::string XV_CC  = "xv-clang";
+    static const std::string CXX    = "clang++";
+    static const std::string XV_CXX = "xv-clang++";
+}
+// using std::filesystem::path;
+namespace fs = std::filesystem;
+fs::path get_root() {
+    char *p = getenv("XV_PATH");
+    if (p == NULL) {
+        WARN("Plz set XV_PATH to root of xv-fuzz");
+        exit(1);
+    }
 
+    fs::path root(p);
+    if(not fs::exists(root)){
+        WARN("XV_PATH not exist");
+        exit(1);
+    }
+
+    return root;
+}
+fs::path find_obj(string_view s) {
+    fs::path root = get_root();
+
+    fs::path obj = root.append("objs")
+                       .append("src")
+                       .append("mod")
+                       .append(s.data());
+
+    DBG("obj : %s", obj.c_str()); 
+    assert(fs::exists(obj));
+    return obj;
+}
+Args &Args::parse_clang_args(int argc, char *argv[]) {
+    // xv-clang -o main main.c -g 
+    std::vector<std::string> params;
+    if (argc < 4) {
+        WARN("the arguments is too few");
+        exit(1);
+    }
+
+    std::string name = argv[0];
+    if(name == XV_CC) {
+        params.push_back(CC);
+    }else if (name == XV_CXX){
+        params.push_back(CXX);
+    }else {
+        WARN("program must in { %s, %s}", XV_CC.c_str(), XV_CXX.c_str());
+        exit(1);
+    }
+    
+    params.push_back(std::string("-Xclang"));
+    params.push_back(std::string(
+        find_obj("xv-llvm-pass.so").c_str()
+    ));
+
+    size_t idx = 1;
+    while(idx < argc) {
+        params.push_back(std::string(argv[idx++]));
+    }
+
+    this->params = params;
+    
+    return *this;
+}
 Args &Args::process() {
     // TODO: need path lib to open a file 
+    // TODO: check 32 / 64
+    // TODO: check AFL_USE_ASAN
     return *this;
+}
+
+Args &Args::show_params() {
+    for(const auto &par : this->params) {
+        std::cout << "[DBG] : " << par.c_str() << std::endl;
+    }
+    return *this;
+}
+
+
+void Args::exec(){
+    u32 len = params.size();
+    const char **argv {(const char **)new char *[len]};
+
+    for (size_t i = 0; i < len; i++) {
+        argv[i] = params[i].c_str();
+    }
+
+    execvp(argv[0], (char **)argv);
 }
