@@ -1,7 +1,12 @@
 #include "common.h"
 
 
+/* the clang fuzz main entry */
+void entry(Args &args) {
 
-void entry(int argc, char **argv) {
+}
+
+
+int main(int argc, char **argv) {
     
 }

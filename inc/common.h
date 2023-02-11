@@ -9,4 +9,6 @@
 
 #include <stdbool.h>
 
+#include "arg.h"
+
 #endif

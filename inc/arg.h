@@ -1,3 +1,5 @@
+#ifndef __ARG_H__
+#define __ARG_H__
 /*
     deal with argv ,supply argv configure to every modules
 */
@@ -7,6 +9,7 @@
 #include <optional>
 #include <list>
 #include <vector>
+#include <exception>
 
 // TODO: make it only internal use
 struct Option {
@@ -28,15 +31,21 @@ namespace KW {
     /* max timeout span */
     static const std::string TIMEOUT_SPAN = "-t";
 
-    const std::vector<const Option> options_table();
+    const std::vector<Option> options_table();
 }
 
 class Args{
-
 public:
-    std::optional<std::map<std::string, std::string>> parse_args(int argc, char *argv[]);
+    Args &parse_args(int argc, char *argv[]);
+    Args &process();
+
 private:
+    std::string fuzzee; /* fuzzee name */
+    std::map<std::string, std::string> user_ops;
+
 
 
 
 };
+
+#endif // __ARG_H__
