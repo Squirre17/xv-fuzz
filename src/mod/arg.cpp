@@ -102,7 +102,13 @@ Args &Args::parse_clang_args(int argc, char *argv[]) {
         exit(1);
     }
 
-    std::string name = argv[0];
+    std::string name = std::string(argv[0]);
+    size_t pos;
+    if(( pos = name.rfind("/")) != std::string::npos) {
+        name = name.substr(pos + 1);
+    }
+    std::cout << "[DBG] : name is " << name << std::endl;
+
     if(name == XV_CC) {
         params.push_back(CC);
     }else if (name == XV_CXX){
@@ -150,4 +156,6 @@ void Args::exec(){
     }
 
     execvp(argv[0], (char **)argv);
+
+    FATAL("execvp failed");
 }
